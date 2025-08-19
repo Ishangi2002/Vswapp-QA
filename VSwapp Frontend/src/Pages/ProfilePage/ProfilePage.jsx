@@ -56,7 +56,7 @@ export const ProfilePage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Update UI without reload
+  // Update UI without reload
       setSkills((prev) => prev.filter((skill) => skill.id !== skillId));
     } catch (err) {
       console.error("Error deleting skill:", err);
