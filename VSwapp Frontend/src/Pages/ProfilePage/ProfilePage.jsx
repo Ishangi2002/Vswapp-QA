@@ -45,7 +45,24 @@ export const ProfilePage = () => {
     };
 
     fetchSkills();
-  }, [userId]);
+  }, [userId,token]);
+
+  //Delete skill
+  const handleDelete = async (skillId) => {
+    if (!window.confirm("Are you sure you want to delete this skill?")) return;
+
+    try {
+      await axios.delete(`http://localhost:8080/api/skill/${skillId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Update UI without reload
+      setSkills((prev) => prev.filter((skill) => skill.id !== skillId));
+    } catch (err) {
+      console.error("Error deleting skill:", err);
+      alert("Failed to delete skill. Please try again.");
+    }
+  };
 
   return (
     <div className="bg-gradient-to-b from-[#090e2d] to-[#111827] min-h-screen text-white">
@@ -141,8 +158,9 @@ export const ProfilePage = () => {
                         <PencilSquareIcon className="w-6 h-6 text-white" />
                       </button>
                     </Link>
+
                     <button className="bg-red-500 p-2 rounded-full">
-                      <TrashIcon className="w-6 h-6 text-white" />
+                      <TrashIcon className="w-6 h-6 text-white" onClick={() => handleDelete(skill.id)} />
                     </button>
                   </div>
                 </div>

@@ -1,15 +1,57 @@
-import React, { useState } from 'react';
-import { Link } from "react-router-dom";
+import React, { useState,useEffect } from 'react';
+import { Link,useParams,useNavigate } from "react-router-dom";
+import axios from "axios";
 import addskill from '../../assets/Images/addskill.png';
 import Navbar2 from '../../Components/Navbar2';
 
 export const UpdateSkill = () => {
+
+  const {id}=useParams();
+  const navigate=useNavigate();
+
+  const [title,setTitle]=useState("");
+  const [category,setCategory]=useState("");
+  const [level,setLevel]=useState("");
+  const [about,setAbout]=useState("");
+  const [image,setImage]=useState("");
   const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8080/api/skill/${id}`)
+      .then((res) => {
+        const skill = res.data;
+        setTitle(skill.title || "");
+        setCategory(skill.category || "");
+        setLevel(skill.level || "");
+        setAbout(skill.about || "");
+        setPreview(skill.imageUrl)
+      })
+      .catch((err) => console.error(err));
+  }, [id]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    const updatedSkill = {
+      title,
+      category,
+      level,
+      about,
+      image: preview
+    };
+
+    try {
+      await axios.put(`http://localhost:8080/api/skill/${id}`, updatedSkill);
+      navigate("/profilepage");
+    } catch (error) {
+      console.error("Error updating skill:", error);
     }
   };
 
@@ -31,25 +73,37 @@ export const UpdateSkill = () => {
         </div>
 
         {/* Right Side Form */}
-        <div className="w-full md:w-1/2 space-y-6">
+        <form onSubmit={handleUpdate} className="w-full md:w-1/2 space-y-6">
           <div>
             <label className="block text-lg">Skill Title <span className="text-red-500">*</span></label>
-            <input type="text" placeholder="React.js" className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2" />
+            <input type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2" />
           </div>
 
           <div>
             <label className="block text-lg">Skill Category <span className="text-red-500">*</span></label>
-            <input type="text" placeholder="Programming" className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2" />
+            <input type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2" />
           </div>
 
           <div>
             <label className="block text-lg">Skill Level <span className="text-red-500">*</span></label>
-            <input type="text" placeholder="Advanced" className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2" />
+            <input type="text"
+            value={level}
+            onChange={(e)=> setLevel(e.target.value)}
+            className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2" />
           </div>
 
           <div>
             <label className="block text-lg">About <span className="text-red-500">*</span></label>
-            <textarea placeholder="I am currently working as a frontend developer..." className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2 h-28 resize-none"></textarea>
+            <textarea
+            value={about}
+            onChange={(e)=>setAbout(e.target.value)}
+            className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2 h-28 resize-none"></textarea>
           </div>
 
           {/* Image Upload */}
@@ -76,12 +130,11 @@ export const UpdateSkill = () => {
           </div>
 
           {/* Submit Button */}
-          <Link to='/profilepage'>
-            <button className="w-full bg-blue-800 hover:bg-indigo-800 text-white rounded-lg p-3 text-lg mt-4">
+          
+            <button type="submit" className="w-full bg-blue-800 hover:bg-indigo-800 text-white rounded-lg p-3 text-lg mt-4">
               Update
             </button>
-          </Link>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ export default function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/skill" element={<SkillPage />} />
         <Route path="/addskill" element={<AddSkillPage />} />
-        <Route path="/updateskill" element={<UpdateSkillPage />} />
+        <Route path="/updateskill/:id" element={<UpdateSkillPage />} />
         <Route path="/profilepage" element={<ProfilePage />} />
         <Route path="/editprofile" element={<EditProfilePage />} />
         <Route path="/contact" element={<ContactPage />} />
