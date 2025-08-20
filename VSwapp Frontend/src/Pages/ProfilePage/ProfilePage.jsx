@@ -9,8 +9,10 @@ import axios from "axios";
 
 export const ProfilePage = () => {
   const [skills, setSkills] = useState([]);
+   const [user, setUser] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [feedbackText, setFeedbackText] = useState("");
   const userId = localStorage.getItem("userId");  
   const token = localStorage.getItem("token");
 
@@ -26,7 +28,8 @@ export const ProfilePage = () => {
   window.location.href = "/login";
   return;
 }
-      try {
+     //get skills by userid 
+    try {
         const response = await axios.get(`http://localhost:8080/api/skill/user/${userId}`,
           {
         headers: {
@@ -44,8 +47,42 @@ export const ProfilePage = () => {
       }
     };
 
+//get userdetails by userid
+
+     const fetchUserDetails = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8080/api/user-details/by-user/${userId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUser(res.data);
+      } catch (err) {
+        console.error("Error fetching user details:", err);
+      }
+    };
+
     fetchSkills();
+    fetchUserDetails();
   }, [userId,token]);
+
+  //delete user
+  const handleDeleteUser = async () => {
+  if (!window.confirm("Are you sure you want to delete your account?")) return;
+
+  try {
+    await axios.delete(`http://localhost:8080/api/user/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    alert("User deleted successfully");
+    localStorage.clear(); 
+    window.location.href = "/"; 
+  } catch (err) {
+    console.error("Failed to delete user:", err);
+    alert("Failed to delete user. Please try again.");
+  }
+};
+
+  
 
   //Delete skill
   const handleDelete = async (skillId) => {
@@ -64,9 +101,40 @@ export const ProfilePage = () => {
     }
   };
 
+  //Add feedback
+  const handleAddFeedback = async () => {
+  if (!feedbackText.trim()) {
+    alert("Please enter feedback before submitting.");
+    return;
+  }
+
+  if (!user) {
+    alert("User details not loaded. Please wait a moment.");
+    return;
+  }
+
+  try {
+    await axios.post("http://localhost:8080/api/feedback", 
+      {
+        comment: feedbackText,
+        name:`${user.firstname} ${user.lastname}`
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert("Feedback submitted successfully!");
+
+    setFeedbackText(""); 
+
+  } catch (err) {
+    console.error("Error submitting feedback:", err);
+    alert("Failed to submit feedback. Try again.");
+  }
+};
+
   return (
     <div className="bg-gradient-to-b from-[#090e2d] to-[#111827] min-h-screen text-white">
-      <Navbar2 />
+      <Navbar2 user={user} />
 
       {/* Background */}
       <div className="flex items-center justify-center mt-20 mb-24">
@@ -93,13 +161,15 @@ export const ProfilePage = () => {
                 <PencilSquareIcon className="w-6 h-6 text-white" />
               </button>
             </Link>
-            <button className="bg-red-500 p-2 rounded-full">
+
+            <button className="bg-red-500 p-2 rounded-full" onClick={handleDeleteUser}>
               <TrashIcon className="w-6 h-6 text-white" />
             </button>
+
           </div>
           <div className="absolute left-10 top-[380px]">
-            <h2 className="text-xl font-semibold">Meera Kapur</h2>
-            <p className="text-white text-sm">meera35@gmail.com</p>
+            <h2 className="text-xl font-semibold"> {user ? `${user.firstname} ${user.lastname}` : "Loading..."}</h2>
+            <p className="text-white text-sm">{user?.email || ""}</p>
             <Link to="/login" className="text-white text-sm underline">
               Logout
             </Link>
@@ -124,7 +194,7 @@ export const ProfilePage = () => {
           <p className="mt-8 ml-10 text-2xl">Published skills</p>
           <p className="ml-10 text-lg text-gray-400">{skills.length} skills</p>
 
-          <div className="flex flex-wrap justify-start items-stretch gap-8 px-10 mt-10">
+          <div className="flex flex-wrap ml-20 items-stretch gap-32 px-10 mt-10">
             {loading ? (
               <p>Loading skills...</p>
             ) : error ? (
@@ -186,15 +256,19 @@ export const ProfilePage = () => {
 
       <div className="flex items-center justify-center mt-10 mb-32">
         <div className="relative bg-blue-950 p-6 rounded-3xl w-[1280px] h-[280px] shadow-lg text-white">
+
           <textarea
             id="feedback"
             rows="5"
             className="w-full p-4 rounded-lg text-white bg-blue-950 shadow-2xl focus:outline-none"
             placeholder="Drop your feedback here..."
+            value={feedbackText}
+            onChange={(e) => setFeedbackText(e.target.value)}
           ></textarea>
+
           <div className="flex justify-center mt-4">
             <Link to="/">
-              <button className="w-96 bg-blue-800 hover:bg-indigo-800 text-white rounded-lg p-3 text-lg ">
+              <button onClick={handleAddFeedback} className="w-96 bg-blue-800 hover:bg-indigo-800 text-white rounded-lg p-3 text-lg ">
                 Add your feedback
               </button>
             </Link>

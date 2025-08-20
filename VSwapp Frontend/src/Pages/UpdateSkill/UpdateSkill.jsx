@@ -13,7 +13,7 @@ export const UpdateSkill = () => {
   const [category,setCategory]=useState("");
   const [level,setLevel]=useState("");
   const [about,setAbout]=useState("");
-  const [image,setImage]=useState("");
+  //const [image,setImage]=useState("");
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {

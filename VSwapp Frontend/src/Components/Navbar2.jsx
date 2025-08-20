@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 
-export const Navbar2 = () => {
+export const Navbar2 = ({user}) => {
   return (
     <header className="bg-transparent text-white py-4 px-6 flex justify-between items-center">
       
@@ -23,7 +23,7 @@ export const Navbar2 = () => {
           <Link to='/profilepage'>
           <div className="flex items-center gap-2 bg-blue-950 text-white px-4 py-2 rounded-full shadow-md hover:shadow-lg transition cursor-pointer mr-10 mt-6">
             <UserCircleIcon className="w-8 h-8 text-white" />
-            <span className="font-medium">Meera Kapur</span> 
+            <span className="font-medium">{user ? `${user.firstname} ${user.lastname}` : "Loading..."}</span> 
           </div> 
           </Link>
           

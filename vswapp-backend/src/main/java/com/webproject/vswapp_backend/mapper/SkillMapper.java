@@ -2,6 +2,7 @@ package com.webproject.vswapp_backend.mapper;
 
 import com.webproject.vswapp_backend.dto.SkillDto;
 import com.webproject.vswapp_backend.entity.Skill;
+import com.webproject.vswapp_backend.entity.Category;
 
 public class SkillMapper {
 
@@ -12,6 +13,12 @@ public class SkillMapper {
         skill.setLevel(skillDto.getLevel());
         skill.setAbout(skillDto.getAbout());
         skill.setImagePath(skillDto.getImagePath());
+
+        if (skillDto.getCategory() != null) {
+            Category category = new Category();
+            category.setCategoryName(skillDto.getCategory());
+            skill.setCategory(category);
+        }
 
         return skill;
     }
@@ -28,6 +35,9 @@ public class SkillMapper {
 
         if(skill.getCategory() != null) {
             skillDto.setCategory(skill.getCategory().getCategoryName());
+        }
+        if (skill.getUser() != null) {
+            skillDto.setUserId(skill.getUser().getId());
         }
         return skillDto;
     }

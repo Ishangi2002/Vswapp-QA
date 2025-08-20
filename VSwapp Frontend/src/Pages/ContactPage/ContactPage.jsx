@@ -1,12 +1,31 @@
-import React from 'react'
+import React,{useState,useEffect} from 'react'
 import Navbar2 from '../../Components/Navbar2';
 import { Link } from 'react-router-dom';
 import { Footer } from '../../Components/Footer';
+import axios from 'axios';
 
 const ContactPage = () => {
+  const [user, setUser] = useState(null);
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/api/user-details/by-user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUser(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchUser();
+  }, [userId, token]);
+
   return (
     <div className="bg-gradient-to-b from-[#090e2d] to-[#111827] min-h-screen text-white">
-      <Navbar2 />
+      <Navbar2 user={user} />
 
       <div className='ml-40 mt-40'>
         <h2 className="text-lg mb-4 underline underline-offset-4">

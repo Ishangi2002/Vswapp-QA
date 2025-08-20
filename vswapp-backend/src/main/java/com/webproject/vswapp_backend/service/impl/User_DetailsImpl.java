@@ -36,11 +36,12 @@ public class User_DetailsImpl implements User_DetailsService {
     }
 
     @Override
-    public User_DetailsDto getUserDetailsById(Long id) {
-        User_Details userDetails = userDetailsRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User details not found with id: " + id));
-        return User_DetailsMapper.mapToUserDetailsDto(userDetails);
+    public User_DetailsDto getUserDetailsByUserId(Long userId) {
+        User_Details details = userDetailsRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User details not found for userId: " + userId));
+        return User_DetailsMapper.mapToUserDetailsDto(details);
     }
+
 
     @Override
     public List<User_DetailsDto> getAllUserDetails() {
@@ -51,16 +52,12 @@ public class User_DetailsImpl implements User_DetailsService {
     }
 
     @Override
-    public User_DetailsDto updateUserDetails(Long id, User_DetailsDto updatedDetailsDto) {
-        User_Details existingDetails = userDetailsRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User details not found with id: " + id));
+    public User_DetailsDto updateUserDetailsByUserId(Long userId, User_DetailsDto updatedDetailsDto) {
+        // Fetch User_Details by userId
+        User_Details existingDetails = userDetailsRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User details not found for userId: " + userId));
 
-        // Fetch associated User entity (if userId can be updated)
-        User user = userRepository.findById(updatedDetailsDto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + updatedDetailsDto.getUserId()));
-
-        // Update fields (assuming you want to update these fields)
-        existingDetails.setUser(user);
+        // Update only the necessary fields
         existingDetails.setFirstname(updatedDetailsDto.getFirstname());
         existingDetails.setLastname(updatedDetailsDto.getLastname());
         existingDetails.setProfilePicture(updatedDetailsDto.getProfilePicture());
@@ -71,11 +68,13 @@ public class User_DetailsImpl implements User_DetailsService {
         return User_DetailsMapper.mapToUserDetailsDto(savedDetails);
     }
 
-    @Transactional
+
     @Override
-    public void deleteUserDetails(Long id) {
-        User_Details existingDetails = userDetailsRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User details not found with id: " + id));
+    @Transactional
+    public void deleteUserDetailsByUserId(Long userId) {
+        User_Details existingDetails = userDetailsRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User details not found for userId: " + userId));
         userDetailsRepository.delete(existingDetails);
     }
+
 }

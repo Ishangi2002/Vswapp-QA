@@ -1,32 +1,94 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Navbar2 from '../../Components/Navbar2';
+import React, { useEffect, useState } from "react";
+import Navbar2 from "../../Components/Navbar2";
+import axios from "axios";
 
 const EditProfilePage = () => {
-  const [name, setName] = useState('Meera Kapur');
-  const [email, setEmail] = useState('meera35@gmail.com');
-  const [password, setPassword] = useState('***********');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  const [user, setUser] = useState(null);
 
-  const handleNameSave = () => {
-    console.log('Name Saved:', name);
-    navigate('/profilepage');
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Fetch user and user details together
+        const [userRes, detailsRes] = await Promise.all([
+          axios.get(`http://localhost:8080/api/user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get(`http://localhost:8080/api/user-details/by-user/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        // Set state
+        setEmail(userRes.data.email);
+        setPassword(""); 
+        setFirstName(detailsRes.data.firstname);
+        setLastName(detailsRes.data.lastname);
+        setUser(userRes.data);
+        
+      } catch (err) {
+        console.error(err);
+        alert("Failed to fetch user data");
+      }
+    };
+
+    fetchUserData();
+  }, [userId, token]);
+
+  // Save handlers
+  const handleSaveName = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/user-details/by-user/${userId}`,
+        { firstname: firstName, lastname: lastName },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Name updated successfully!");
+      
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update name");
+    }
   };
 
-  const handleEmailSave = () => {
-    console.log('Email Saved:', email);
-    navigate('/profilepage');
+  const handleSaveEmail = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/user/${userId}`,
+        { email },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Email updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update email");
+    }
   };
 
-  const handlePasswordSave = () => {
-    console.log('Password Saved:', password);
-    navigate('/profilepage');
+  const handleSavePassword = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/user/${userId}`,
+        { password },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Password updated successfully!");
+      setPassword(""); // clear after saving
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update password");
+    }
   };
 
   return (
     <div className="bg-gradient-to-b from-[#090e2d] to-[#111827] min-h-screen text-white">
-      <Navbar2 />
+      <Navbar2 user={user}/>
 
       <div className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
         <h1 className="text-3xl font-semibold mb-8">Edit Profile</h1>
@@ -35,16 +97,34 @@ const EditProfilePage = () => {
 
           {/* Name */}
           <div>
-            <label className="block mb-2 text-lg">Name</label>
+            <label className="block mb-2 text-lg">First Name</label>
             <div className="flex">
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 className="flex-grow p-3 rounded-l-lg bg-blue-950 text-white"
               />
               <button
-                onClick={handleNameSave}
+                onClick={handleSaveName}
+                className="bg-blue-900 hover:bg-blue-700 px-6 rounded-r-lg"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block mb-2 text-lg">Last Name</label>
+            <div className="flex">
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="flex-grow p-3 rounded-l-lg bg-blue-950 text-white"
+              />
+              <button
+                onClick={handleSaveName}
                 className="bg-blue-900 hover:bg-blue-700 px-6 rounded-r-lg"
               >
                 Save
@@ -63,7 +143,7 @@ const EditProfilePage = () => {
                 className="flex-grow p-3 rounded-l-lg bg-blue-950 text-white"
               />
               <button
-                onClick={handleEmailSave}
+                onClick={handleSaveEmail}
                 className="bg-blue-900 hover:bg-blue-700 px-6 rounded-r-lg"
               >
                 Save
@@ -79,10 +159,11 @@ const EditProfilePage = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter new password"
                 className="flex-grow p-3 rounded-l-lg bg-blue-950 text-white"
               />
               <button
-                onClick={handlePasswordSave}
+                onClick={handleSavePassword}
                 className="bg-blue-900 hover:bg-blue-700 px-6 rounded-r-lg"
               >
                 Save

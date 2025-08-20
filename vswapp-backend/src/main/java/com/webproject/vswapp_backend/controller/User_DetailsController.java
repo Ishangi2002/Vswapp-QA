@@ -2,6 +2,7 @@ package com.webproject.vswapp_backend.controller;
 
 import com.webproject.vswapp_backend.dto.User_DetailsDto;
 import com.webproject.vswapp_backend.service.User_DetailsService;
+import com.webproject.vswapp_backend.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 public class User_DetailsController {
 
     private User_DetailsService userDetailsService;
+    private final UserService userService;
 
     // Create new User_Details
 
@@ -25,12 +27,13 @@ public class User_DetailsController {
         return new ResponseEntity<>(savedDetails, HttpStatus.CREATED);
     }
 
-    // Get User_Details by ID
-    @GetMapping("{id}")
-    public ResponseEntity<User_DetailsDto> getUserDetailsById(@PathVariable("id") Long id) {
-        User_DetailsDto detailsDto = userDetailsService.getUserDetailsById(id);
+    // Get User_Details by User ID
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<User_DetailsDto> getUserDetailsByUserId(@PathVariable("userId") Long userId) {
+        User_DetailsDto detailsDto = userDetailsService.getUserDetailsByUserId(userId);
         return ResponseEntity.ok(detailsDto);
     }
+
 
     // Get all User_Details
     @GetMapping
@@ -40,17 +43,24 @@ public class User_DetailsController {
     }
 
     // Update User_Details by ID
-    @PutMapping("{id}")
-    public ResponseEntity<User_DetailsDto> updateUserDetails(@PathVariable("id") Long id,
-                                                             @RequestBody User_DetailsDto updatedDetails) {
-        User_DetailsDto updated = userDetailsService.updateUserDetails(id, updatedDetails);
+    @PutMapping("/by-user/{userId}")
+    public ResponseEntity<User_DetailsDto> updateUserDetailsByUserId(
+            @PathVariable("userId") Long userId,
+            @RequestBody User_DetailsDto updatedDetails) {
+
+        // Call service method to update using userId
+        User_DetailsDto updated = userDetailsService.updateUserDetailsByUserId(userId, updatedDetails);
         return ResponseEntity.ok(updated);
     }
 
     // Delete User_Details by ID
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteUserDetails(@PathVariable Long id) {
-        userDetailsService.deleteUserDetails(id);
-        return ResponseEntity.ok("User details deleted successfully.");
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+        // Delete user details first
+        userDetailsService.deleteUserDetailsByUserId(id);
+        // Then delete user
+        userService.deleteUser(id);
+        return ResponseEntity.ok("User and their details deleted successfully");
     }
+
 }

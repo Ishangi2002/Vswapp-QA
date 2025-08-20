@@ -16,4 +16,6 @@ public class User_DetailsDto {
     private String firstname;
     private String lastname;
     private String profilePicture;
+    private String email;
+
 }

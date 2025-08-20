@@ -12,7 +12,8 @@ public class User_DetailsMapper {
                 details.getUser() != null ? details.getUser().getId() : null,
                 details.getFirstname(),
                 details.getLastname(),
-                details.getProfilePicture()
+                details.getProfilePicture(),
+                details.getUser() != null ? details.getUser().getEmail() : null
         );
     }
 

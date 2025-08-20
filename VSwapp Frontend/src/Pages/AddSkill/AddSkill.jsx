@@ -12,8 +12,17 @@ export const AddSkill = () => {
     const [level,setLevel]=useState("");
     const [about,setAbout]=useState("");
     const [image,setImage]=useState("");
+      const [preview, setPreview] = useState(null);
     const navigate=useNavigate();
     const currentUserId = localStorage.getItem("userId");
+
+    const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+    if (file) {
+      setPreview(URL.createObjectURL(file)); 
+    }
+  };
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -48,7 +57,7 @@ export const AddSkill = () => {
 
     console.log("Skill created:", createdSkill);
 
-    // Upload image (FormData)
+    // Upload image 
     if (image) {
       const formData = new FormData();
       formData.append("image", image);
@@ -125,10 +134,16 @@ export const AddSkill = () => {
           <div>
             <label className="block text-lg">Attach image <span className="text-red-500">*</span></label>
             <input type="file" accept="image/*" 
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={handleImageChange}
             className="w-full bg-indigo-950 text-white rounded-lg p-3 mt-2 
               file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 
               file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+              {preview && (
+              <div className="mt-4">
+                <p className="text-white mb-1">Preview:</p>
+                <img src={preview} alt="Preview" className="w-48 h-48 object-cover rounded-xl border" />
+              </div>
+            )}
           </div>
 
           

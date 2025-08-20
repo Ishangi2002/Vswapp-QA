@@ -110,6 +110,12 @@ public class SkillServiceImpl implements SkillService {
       skill.setLevel(updatedSkill.getLevel());
       skill.setAbout(updatedSkill.getAbout());
       skill.setImagePath(updatedSkill.getImagePath());
+        if (updatedSkill.getCategory() != null) {
+            Category category = categoryRepository.findByCategoryName(updatedSkill.getCategory())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Category not found with name: " + updatedSkill.getCategory()));
+            skill.setCategory(category);
+        }
 
       Skill updatedSkillObj =  skillRepository.save(skill);
 

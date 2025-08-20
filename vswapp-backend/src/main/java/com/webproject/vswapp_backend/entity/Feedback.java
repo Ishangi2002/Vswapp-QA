@@ -21,7 +21,7 @@ public class Feedback {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "comment")
+    @Column(nullable = false)
     private String comment;
 
     @Column(name = "add_date")

@@ -8,6 +8,8 @@ import com.webproject.vswapp_backend.service.FeedbackService;
 import com.webproject.vswapp_backend.repository.FeedbackRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,10 +22,21 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public FeedbackDto createFeedback(FeedbackDto feedbackDto) {
+        // Map DTO → Entity
         Feedback feedback = FeedbackMapper.mapToFeedback(feedbackDto);
+
+        // Ensure addDate is set to now if null
+        if (feedback.getAddDate() == null) {
+            feedback.setAddDate(LocalDateTime.now());
+        }
+
+        // Save the feedback to DB
         Feedback savedFeedback = feedbackRepository.save(feedback);
+
+        // Map Entity → DTO and return
         return FeedbackMapper.mapToFeedbackDto(savedFeedback);
     }
+
 
     @Override
     public FeedbackDto getFeedbackById(Long feedbackId) {
