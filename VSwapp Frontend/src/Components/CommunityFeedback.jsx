@@ -23,7 +23,7 @@ export const CommunityFeedback = () => {
         Community Feedback
       </h2>
 
-      <div className="ml-50 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-30 place-items-center mt-10">
+      <div className="ml-50 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-30 place-items-center mt-[-20px]">
         {feedbacks.length === 0 ? (
           <p className="text-gray-400">No feedback yet.</p>
         ) : (

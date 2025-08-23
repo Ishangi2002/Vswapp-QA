@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const TrendingSkills = () => {
   const skills = [
@@ -21,7 +22,7 @@ const TrendingSkills = () => {
         <div className="text-4xl mb-4">{skill.icon}</div> 
         <h3 className="text-xl font-semibold mb-2 text-white">{skill.name}</h3>
         <p className="text-gray-400 text-sm">{skill.desc}</p>
-        <button className="border border-gray-500 text-white px-6 py-2 rounded-full hover:bg-blue-800 mt-8">Learn More  →</button>
+        <Link to="/skill"><button className="border border-gray-500 text-white px-6 py-2 rounded-full hover:bg-blue-800 mt-8">Learn More  →</button></Link>
 
       </div>
     ))}

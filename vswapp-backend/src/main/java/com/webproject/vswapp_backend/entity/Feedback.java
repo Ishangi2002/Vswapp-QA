@@ -26,4 +26,6 @@ public class Feedback {
 
     @Column(name = "add_date")
     private LocalDateTime addDate;
+
+
 }

@@ -75,14 +75,18 @@ public class SkillServiceImpl implements SkillService {
             Files.createDirectories(uploadPath);
         }
 
+        // Use skillId + original file name
         String fileName = skillId + "_" + imageFile.getOriginalFilename();
         Path filePath = uploadPath.resolve(fileName);
-        Files.copy(imageFile.getInputStream(), filePath);
+
+        // If file already exists, replace it
+        Files.copy(imageFile.getInputStream(), filePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
         // Save path in database
         skill.setImagePath(fileName);
         skillRepository.save(skill);
     }
+
 
     @Override
     public List<SkillDto> getAllSkills() {

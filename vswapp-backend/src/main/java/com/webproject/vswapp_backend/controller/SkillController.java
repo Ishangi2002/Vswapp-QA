@@ -75,6 +75,22 @@ public class SkillController {
       return ResponseEntity.ok(skillDto);
     }
 
+    //Build update Skill Image REST API
+    @PutMapping("/{skillId}/image")
+    public ResponseEntity<String> updateSkillImage(
+            @PathVariable Long skillId,
+            @RequestParam("image") MultipartFile imageFile) {
+
+        try {
+            skillService.saveSkillImage(skillId, imageFile);
+            return ResponseEntity.ok("Image updated successfully.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error updating image: " + e.getMessage());
+        }
+    }
+
+
     //Build delete Skill REST API
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteSkill(@PathVariable("id") Long skillId){

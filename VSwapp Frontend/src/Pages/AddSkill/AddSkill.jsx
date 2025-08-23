@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import { Link,useNavigate } from "react-router-dom";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import addskill from '../../assets/Images/addskill.png';
@@ -12,7 +12,8 @@ export const AddSkill = () => {
     const [level,setLevel]=useState("");
     const [about,setAbout]=useState("");
     const [image,setImage]=useState("");
-      const [preview, setPreview] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [user, setUser] = useState(null);
     const navigate=useNavigate();
     const currentUserId = localStorage.getItem("userId");
 
@@ -78,11 +79,20 @@ export const AddSkill = () => {
   }
 };
 
+//display username in navbar
+useEffect(() => {
+  const userId = localStorage.getItem("userId");
+  if (userId) {
+    axios.get(`http://localhost:8080/api/user/${userId}`)
+      .then(res => setUser(res.data))
+      .catch(err => console.error(err));
+  }
+}, []);
 
 
   return (
     <div className="bg-gradient-to-b from-[#090e2d] to-[#111827] min-h-screen text-white">
-      <Navbar2 />
+      <Navbar2 user={user} />
       <div className="flex flex-col md:flex-row items-center justify-between px-8 md:px-24 py-12 gap-10">
 
         
@@ -142,7 +152,7 @@ export const AddSkill = () => {
               <div className="mt-4">
                 <p className="text-white mb-1">Preview:</p>
                 <img src={preview} alt="Preview" className="w-48 h-48 object-cover rounded-xl border" />
-              </div>
+              </div> 
             )}
           </div>
 

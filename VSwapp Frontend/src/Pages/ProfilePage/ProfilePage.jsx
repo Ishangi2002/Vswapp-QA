@@ -203,16 +203,17 @@ export const ProfilePage = () => {
               <p className="ml-6">No skills published yet.</p>
             ) : (
               skills.map((skill) => (
+                
                 <div
                   key={skill.id}
                   className="flex flex-col border border-blue-900 bg-blue-950 rounded-3xl w-[450px] shadow-2xl min-h-[420px] h-full"
                 >
                   <span className="text-lg ml-6 mt-4 block">{skill.title}</span>
-                  {skill.imagePath && skill.imagePath.startsWith('http') ? (
+                  {skill.imagePath ? (
                     <img
                       src={skill.imagePath}
                       alt={skill.title}
-                      className="w-full h-[200px] object-cover rounded-b-3xl mt-[10px]"
+                      className="w-full h-[250px] object-cover rounded-b-3xl mt-[10px]"
                     />
                   ):(
                     <div className="w-full h-[200px] bg-gray-700 flex items-center justify-center text-gray-400">

@@ -15,6 +15,7 @@ export const UpdateSkill = () => {
   const [about,setAbout]=useState("");
   //const [image,setImage]=useState("");
   const [preview, setPreview] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     axios.get(`http://localhost:8080/api/skill/${id}`)
@@ -24,11 +25,12 @@ export const UpdateSkill = () => {
         setCategory(skill.category || "");
         setLevel(skill.level || "");
         setAbout(skill.about || "");
-        setPreview(skill.imageUrl)
+        setPreview(skill.imageUrl|| null)
       })
       .catch((err) => console.error(err));
   }, [id]);
 
+  //handle image preview
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -49,15 +51,37 @@ export const UpdateSkill = () => {
 
     try {
       await axios.put(`http://localhost:8080/api/skill/${id}`, updatedSkill);
+
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput && fileInput.files[0]) {
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+
+        await axios.put(`http://localhost:8080/api/skill/${id}/image`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        });
+      }
       navigate("/profilepage");
     } catch (error) {
       console.error("Error updating skill:", error);
     }
   };
 
+  //display username in navbar
+useEffect(() => {
+  const userId = localStorage.getItem("userId");
+  if (userId) {
+    axios.get(`http://localhost:8080/api/user/${userId}`)
+      .then(res => setUser(res.data))
+      .catch(err => console.error(err));
+  }
+}, []);
+
   return (
     <div className="bg-gradient-to-b from-[#090e2d] to-[#111827] min-h-screen text-white">
-      <Navbar2 />
+      <Navbar2 user={user} />
       <div className="flex flex-col md:flex-row items-center justify-between px-8 md:px-24 py-12 gap-10">
 
         {/* Left Side */}

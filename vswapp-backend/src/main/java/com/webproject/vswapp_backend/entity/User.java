@@ -30,14 +30,10 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // Many-to-Many with Skill
-    @ManyToMany
-    @JoinTable(
-            name = "user_skill",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "skill_id")
-    )
-    private Set<Skill> skills = new HashSet<>();
+    // One-to-Many with Skill
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Skill> skills = new ArrayList<>();
+
 
     // One-to-One with UserDetails
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

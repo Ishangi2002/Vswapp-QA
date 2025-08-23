@@ -30,7 +30,10 @@ const HeroSection = () => {
     <Link to="/login">
           <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-800">Get Started</button>
     </Link>
+
+    <Link to="/contact">
           <button className="border border-white px-6 py-2 rounded-full hover:bg-white hover:text-black">Learn More</button>
+    </Link>
         </div>
         <div className="mt-6 text-base flex gap-8 justify-center md:justify-start text-white ">
           <span>🔍 Discover</span>
