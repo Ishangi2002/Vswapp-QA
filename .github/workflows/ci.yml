@@ -1,39 +1,41 @@
-name: VSwapp Backend CI
+name: Java CI with Maven
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        distribution: temurin
-        java-version: 17
+      # Set up JDK 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: temurin
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+      # Build the backend project with Maven
+      - name: Build with Maven
+        working-directory: vswapp-backend
+        run: mvn clean install -B
 
-    - name: Build and run tests
-      run: mvn clean test -Dspring.profiles.active=test
+      # Run tests
+      - name: Run tests
+        working-directory: vswapp-backend
+        run: mvn test
 
-    - name: Upload Surefire Test Results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: surefire-reports
-        path: target/surefire-reports
+      # Upload Surefire test reports
+      - name: Upload Surefire Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: vswapp-backend/target/surefire-reports
