@@ -2,19 +2,16 @@ name: CI Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -26,17 +23,8 @@ jobs:
         run: chmod +x mvnw
         working-directory: vswapp-backend
 
-      - name: Build project
-        run: ./mvnw clean install -DskipTests=false
-        working-directory: vswapp-backend
-
-      - name: Run unit tests with H2
-        run: ./mvnw test -Dspring.profiles.active=test
-        working-directory: vswapp-backend
-
-      # Optional: Run Selenium UI tests headless
-      - name: Run Selenium UI tests
-        run: ./mvnw verify -DskipUnitTests=false -Dspring.profiles.active=test
+      - name: Build and run tests
+        run: ./mvnw clean verify -Dspring.profiles.active=test
         working-directory: vswapp-backend
 
       - name: Archive test reports
