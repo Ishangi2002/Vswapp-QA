@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: VSWApp Backend CI/CD
 
 on:
   push:
@@ -7,35 +7,53 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      # Optional: MySQL service for integration tests
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: vswappdb
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
-      # Checkout the repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 17
           distribution: temurin
+          java-version: 17
 
-      # Build the backend project with Maven
-      - name: Build with Maven
-        working-directory: vswapp-backend
-        run: mvn clean install -B
-
-      # Run tests
-      - name: Run tests
-        working-directory: vswapp-backend
-        run: mvn test
-
-      # Upload Surefire test reports
-      - name: Upload Surefire Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
         with:
-          name: surefire-reports
-          path: vswapp-backend/target/surefire-reports
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Cache Selenium binaries
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/selenium
+          key: selenium-${{ hashFiles('**/pom.xml') }}
+
+      - name: Build project
+        run: mvn clean compile --batch-mode
+
+      - name: Run unit & integration tests
+        run: mvn test --batch-mode
+
+      - name: Build JAR
+        run: mvn package --batch-mode
