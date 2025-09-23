@@ -18,6 +18,8 @@ import static org.mockito.Mockito.*;
 
 class SkillServiceTest {
 
+
+
     @Mock
     private SkillRepository skillRepository;
 

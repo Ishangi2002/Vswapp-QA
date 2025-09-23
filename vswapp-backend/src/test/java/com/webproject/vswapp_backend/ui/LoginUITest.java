@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
 
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("test")
 public class LoginUITest {
 
     @LocalServerPort
