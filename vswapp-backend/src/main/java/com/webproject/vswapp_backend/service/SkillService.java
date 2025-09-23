@@ -15,4 +15,5 @@ public interface SkillService {
      void saveSkillImage(Long skillId, MultipartFile imageFile) throws IOException;
      List<SkillDto> getSkillsByUserId(Long userId);
 
+
 }

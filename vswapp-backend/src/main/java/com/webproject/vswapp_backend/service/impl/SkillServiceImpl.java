@@ -11,6 +11,7 @@ import com.webproject.vswapp_backend.repository.UserRepository;
 import com.webproject.vswapp_backend.repository.CategoryRepository;
 import com.webproject.vswapp_backend.service.SkillService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,12 +27,30 @@ import java.nio.file.Paths;
 
 public class SkillServiceImpl implements SkillService {
 
+    @Autowired
     private SkillRepository skillRepository;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private CategoryRepository categoryRepository;
 
+
+    //Before Refactor
     @Override
     public SkillDto createSkill(SkillDto skillDto, Long userId) {
+
+        // --- Validation ---
+        if (skillDto.getTitle() == null || skillDto.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Skill title cannot be empty");
+        }
+
+        if (skillDto.getLevel() == null || skillDto.getLevel().isBlank()) {
+            throw new IllegalArgumentException("Skill level cannot be empty");
+        }
+
+        if (skillDto.getCategory() == null || skillDto.getCategory().isBlank()) {
+            throw new IllegalArgumentException("Skill category cannot be empty");
+        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -47,10 +66,51 @@ public class SkillServiceImpl implements SkillService {
         skill.setUser(user);
         skill.setCategory(category);
 
-        Skill savedSkill =  skillRepository.save(skill);
+        Skill savedSkill = skillRepository.save(skill);
 
         return SkillMapper.mapToSkillDto(savedSkill);
     }
+
+    //After Refactor
+    /*@Override
+    public SkillDto createSkill(SkillDto skillDto, Long userId) {
+        // --- Validate input ---
+        validateSkill(skillDto);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        Category category = categoryRepository.findByCategoryName(skillDto.getCategory())
+                .orElseGet(() -> {
+                    Category newCategory = new Category();
+                    newCategory.setCategoryName(skillDto.getCategory());
+                    return categoryRepository.save(newCategory);
+                });
+
+        Skill skill = SkillMapper.mapToSkill(skillDto);
+        skill.setUser(user);
+        skill.setCategory(category);
+
+        Skill savedSkill = skillRepository.save(skill);
+
+        return SkillMapper.mapToSkillDto(savedSkill);
+    }
+
+    private void validateSkill(SkillDto skillDto) {
+        if (skillDto.getTitle() == null || skillDto.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Skill title cannot be empty");
+        }
+
+        if (skillDto.getLevel() == null || skillDto.getLevel().isBlank()) {
+            throw new IllegalArgumentException("Skill level cannot be empty");
+        }
+
+        if (skillDto.getCategory() == null || skillDto.getCategory().isBlank()) {
+            throw new IllegalArgumentException("Skill category cannot be empty");
+        }
+    }
+
+*/
 
     @Override
     public SkillDto getSkillById(Long skillId) {
@@ -103,8 +163,6 @@ public class SkillServiceImpl implements SkillService {
     }
 
 
-
-
     @Override
     public SkillDto updateSkill(Long skillId, SkillDto updatedSkill) {
       Skill skill =  skillRepository.findById(skillId)
@@ -134,6 +192,14 @@ public class SkillServiceImpl implements SkillService {
         skillRepository.deleteById(skillId);
 
     }
+
+
+
+
+
+
+
+
 
 
 }

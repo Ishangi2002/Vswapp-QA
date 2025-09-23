@@ -13,21 +13,36 @@ import java.util.Map;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5173") // Allow React frontend
 public class AuthController {
 
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDto loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserDto loginRequest) {
+        Map<String, Object> response = new HashMap<>();
+
+        // Find user by email
         UserDto user = userService.findByEmail(loginRequest.getEmail());
 
-        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
-            Map<String, String> response = new HashMap<>();
-            response.put("token", "dummy-token-123");
-            response.put("userId", user.getId().toString());
-            return ResponseEntity.ok(response);
+        if (user == null) {
+            response.put("success", false);
+            response.put("message", "User not found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+
+        // Check password
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            response.put("success", false);
+            response.put("message", "Invalid password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // Login success
+        response.put("success", true);
+        response.put("message", "Login successful");
+        response.put("token", "dummy-token-123"); // Replace with real JWT later
+        response.put("userId", user.getId());
+        return ResponseEntity.ok(response);
     }
 }

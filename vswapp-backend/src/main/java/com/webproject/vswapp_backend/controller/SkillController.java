@@ -4,6 +4,7 @@ import com.webproject.vswapp_backend.dto.SkillDto;
 import com.webproject.vswapp_backend.service.SkillService;
 import com.webproject.vswapp_backend.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,15 +19,21 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 
 public class SkillController {
+    @Autowired
     private SkillService skillService;
     private UserService userService;
 
     //Build Add Skill REST API
-    @PostMapping
+   @PostMapping
     public ResponseEntity<SkillDto> createSkill(@RequestBody SkillDto skillDto) {
+        // Validate title
+        if (skillDto.getTitle() == null || skillDto.getTitle().isBlank()) {
+            return ResponseEntity.badRequest().build(); // 400
+        }
         SkillDto savedSkill = skillService.createSkill(skillDto, skillDto.getUserId());
-        return new ResponseEntity<>(savedSkill, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedSkill, HttpStatus.CREATED); // 201
     }
+
 
     //Build Upload image REST API
 
