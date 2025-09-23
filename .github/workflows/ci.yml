@@ -32,7 +32,8 @@ jobs:
       run: ./mvnw verify -DskipUnitTests=false
 
     - name: Archive test reports
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-reports
-        path: target/surefire-reports/
+  uses: actions/upload-artifact@v3.1.1
+  with:
+    name: test-reports
+    path: target/surefire-reports/
+
