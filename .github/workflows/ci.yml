@@ -1,4 +1,4 @@
-name: Java CI/CD
+name: Java CI
 
 on:
   push:
@@ -11,20 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: '17'
 
-      - name: Build project
-        run: mvn clean install
+    - name: Build with Maven
+      run: mvn clean install
+      working-directory: vswapp-backend   
 
-      - name: Run unit tests
-        run: mvn test
-
-      - name: Run automation tests
-        run: mvn verify
+    - name: Run Tests
+      run: mvn test
+      working-directory: vswapp-backend   
