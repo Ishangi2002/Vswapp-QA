@@ -3,12 +3,13 @@ package com.webproject.vswapp_backend.ui;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.springframework.test.context.ActiveProfiles;
+
 
 import java.time.Duration;
 
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles("test")
+
 public class LoginUITest {
 
     @LocalServerPort
@@ -29,13 +30,19 @@ public class LoginUITest {
 
     @BeforeEach
     public void setUp() {
-        WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
+        WebDriverManager.chromedriver().setup(); // automatically gets the correct ChromeDriver
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080",
+                "--no-sandbox", "--disable-dev-shm-usage");
+
+        driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        baseUrl = "http://localhost:" + port;
     }
+
+
+
 
     @Test
     @Order(1)
