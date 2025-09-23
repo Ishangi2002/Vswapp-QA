@@ -30,9 +30,12 @@ jobs:
 
     - name: Build project
       run: mvn clean install -DskipTests
+      working-directory: vswapp-backend
 
     - name: Run only unit tests
       run: mvn test -Dtest=*ServiceTest,*RepositoryTest
+      working-directory: vswapp-backend
+
 
     - name: Show test results
       run: cat target/surefire-reports/*.txt || true
