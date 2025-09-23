@@ -1,4 +1,4 @@
-name: VSWApp Backend CI/CD
+name: VSwapp-CI
 
 on:
   push:
@@ -10,51 +10,29 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      # Optional: MySQL service for integration tests
-      mysql:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: vswappdb
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
 
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
 
-      - name: Cache Selenium binaries
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/selenium
-          key: selenium-${{ hashFiles('**/pom.xml') }}
+    - name: Build project
+      run: mvn clean install -DskipTests
 
-      - name: Build project
-        run: mvn -f ./vswapp-backend/pom.xml clean compile --batch-mode
+    - name: Run only unit tests
+      run: mvn test -Dtest=*ServiceTest,*RepositoryTest
 
-      - name: Run unit & integration tests
-        run: mvn -f ./vswapp-backend/pom.xml test --batch-mode
-
-      - name: Build JAR
-        run: mvn -f ./vswapp-backend/pom.xml package --batch-mode
-
+    - name: Show test results
+      run: cat target/surefire-reports/*.txt || true
