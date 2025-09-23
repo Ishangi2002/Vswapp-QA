@@ -50,10 +50,11 @@ jobs:
           key: selenium-${{ hashFiles('**/pom.xml') }}
 
       - name: Build project
-        run: mvn clean compile --batch-mode
+        run: mvn -f ./vswapp-backend/pom.xml clean compile --batch-mode
 
       - name: Run unit & integration tests
-        run: mvn test --batch-mode
+        run: mvn -f ./vswapp-backend/pom.xml test --batch-mode
 
       - name: Build JAR
-        run: mvn package --batch-mode
+        run: mvn -f ./vswapp-backend/pom.xml package --batch-mode
+
