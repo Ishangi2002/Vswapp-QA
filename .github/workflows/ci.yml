@@ -1,34 +1,30 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - name: Make Maven Wrapper executable
-        run: chmod +x mvnw
-        working-directory: vswapp-backend
+    - name: Build project
+      run: mvn clean install -DskipTests=false
 
-      - name: Build and run tests
-        run: ./mvnw clean verify -Dspring.profiles.active=test
-        working-directory: vswapp-backend
+    - name: Run unit tests
+      run: mvn test
 
-      - name: Archive test reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: vswapp-backend/target/surefire-reports/
+    - name: Run automation tests
+      run: mvn verify -DskipUnitTests=true
