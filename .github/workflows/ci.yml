@@ -7,26 +7,36 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  build-and-analyze:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for SonarQube to analyze full history
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: 17
 
     - name: Cache Maven packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
+
+    - name: Cache SonarQube packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: |
+          ${{ runner.os }}-sonar
 
     - name: Build project
       run: mvn clean install -DskipTests
@@ -36,11 +46,15 @@ jobs:
       run: mvn test -Dtest=*ServiceTest,*RepositoryTest
       working-directory: vswapp-backend
 
-
     - name: Show test results
       run: cat target/surefire-reports/*.txt || true
+      working-directory: vswapp-backend
 
-    
-
-    
-
+    - name: SonarQube Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+           -Dsonar.projectKey=Ishangi2002_Vswapp-QA \
+           -Dsonar.host.url=https://sonarcloud.io \
+           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      working-directory: vswapp-backend
